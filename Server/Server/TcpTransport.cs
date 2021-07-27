@@ -3,14 +3,16 @@ using System.Net.Sockets;
 
 namespace Server
 {
-    public class Tcp
+    public class TcpTransport
     {
-        private TcpClient _socket;
+        private static int DataBufferSize = 4096;
+        
         private readonly int _id;
+        private TcpClient _socket;
         private NetworkStream _stream;
         private byte[] _receiveBuffer;
 
-        public Tcp(int id)
+        public TcpTransport(int id)
         {
             _id = id;
         }
@@ -18,11 +20,11 @@ namespace Server
         public void Connect(TcpClient socket)
         {
             _socket = socket;
-            _socket.ReceiveBufferSize = Client.DataBufferSize;
-            _socket.SendBufferSize = Client.DataBufferSize;
+            _socket.ReceiveBufferSize = DataBufferSize;
+            _socket.SendBufferSize = DataBufferSize;
             _stream = _socket.GetStream();
-            _receiveBuffer = new byte[Client.DataBufferSize];
-            _stream.BeginRead(_receiveBuffer, 0, Client.DataBufferSize, ReceiveCallback, null);
+            _receiveBuffer = new byte[DataBufferSize];
+            _stream.BeginRead(_receiveBuffer, 0, DataBufferSize, ReceiveCallback, null);
         }
 
         private void ReceiveCallback(IAsyncResult ar)
@@ -38,7 +40,7 @@ namespace Server
                 byte[] data = new byte[byteLength];
                 Array.Copy(_receiveBuffer, data, byteLength);
 
-                _stream.BeginRead(_receiveBuffer, 0, Client.DataBufferSize, ReceiveCallback, null);
+                _stream.BeginRead(_receiveBuffer, 0, DataBufferSize, ReceiveCallback, null);
             }
             catch (Exception ex)
             {

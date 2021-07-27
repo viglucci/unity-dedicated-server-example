@@ -7,10 +7,10 @@ namespace Server
 {
     public class Server
     {
-        private int _maxPlayers;
-        private int _port;
+        private readonly int _maxPlayers;
+        private readonly int _port;
+        private readonly Dictionary<int, Client> _clients = new();
         private TcpListener _tcpListener;
-        private Dictionary<int, Client> _clients = new Dictionary<int, Client>();
 
         public Server(int maxPlayers, int port)
         {
@@ -44,7 +44,7 @@ namespace Server
 
             int nextClientId = NextClientId();
             Client client = new(nextClientId);
-            client.Tcp.Connect(tcpClient);
+            client.TcpTransport.Connect(tcpClient);
             _clients[nextClientId] = client;
         }
 
